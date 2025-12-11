@@ -1,50 +1,46 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  const [message, setMessage] = useState("");
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const fetchDashboard = async () => {
-      const token = localStorage.getItem("token");
-
-      const response = await fetch("http://localhost:5000/admin/dashboard", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (data.message) {
-        setMessage(data.message);
-      } else {
-        setMessage("Unauthorized");
-      }
-    };
-
-    fetchDashboard();
+    fetch("http://localhost:5000/users/all")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch((err) => console.log("Error:", err));
   }, []);
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>{message}</h2>
+    <div>
+      <h2 className="mb-4">All Users</h2>
 
-      <button
-        onClick={() => {
-          localStorage.removeItem("token");
-          window.location.href = "/";
-        }}
-        style={{
-          marginTop: "20px",
-          padding: "10px",
-          background: "red",
-          color: "white",
-          borderRadius: "5px",
-          border: "none",
-        }}
-      >
-        Logout
-      </button>
+      <table className="table table-striped table-bordered">
+        <thead className="table-dark">
+          <tr>
+            <th>User Name</th>
+            <th>Email</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {users.length > 0 ? (
+            users.map((u) => (
+              <tr key={u._id}>
+                <td>{u.username}</td>
+                <td>{u.email}</td>
+                <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3" className="text-center">
+                No users found
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }

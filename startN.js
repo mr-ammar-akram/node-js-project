@@ -37,7 +37,9 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
+const userRoutes = require("./routes/userRoutes");
 
+app.use("/users", userRoutes);
 const app = express();
 app.use(express.json());
 app.use(cors());

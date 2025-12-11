@@ -24,7 +24,7 @@ export default function Login() {
   };
 
   return (
-    <div style={{
+    <div className="login-container" style={{
       maxWidth: "350px",
       margin: "50px auto",
       border: "1px solid #ddd",

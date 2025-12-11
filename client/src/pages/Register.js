@@ -26,7 +26,7 @@ export default function Register() {
   };
 
   return (
-    <div style={{
+    <div className="register-container" style={{
       maxWidth: "350px",
       margin: "50px auto",
       border: "1px solid #ddd",
