@@ -1,8 +1,9 @@
-const mongodb = require('mongoose');
+const mongoose = require("mongoose");
 
-const adminSchema = new mongodb.Schema({
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true }
-});
+const adminSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },  // add email field
+  password: { type: String, required: true }
+}, { timestamps: true }); // add timestamps to track createdAt
 
-module.exports = mongodb.model('Admin', adminSchema);
+module.exports = mongoose.model("Admin", adminSchema);

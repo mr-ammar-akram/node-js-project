@@ -45,4 +45,20 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Check admin exist or not
+router.get("/check-admin", async (req, res) => {
+  try {
+    const admins = await Admin.find();
+
+    if (admins.length === 0) {
+      return res.json({ exists: false });
+    }
+
+    res.json({ exists: true });
+
+  } catch (error) {
+    res.json({ exists: false });
+  }
+});
+
 module.exports = router;
