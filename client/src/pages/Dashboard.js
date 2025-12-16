@@ -8,8 +8,15 @@ export default function Dashboard() {
     username: "",
     email: "",
     password: "",
-    role: "User"
+    role: "User",
+    address: "",
+    phone: "",
+    profilePicture: "" // URL or base64
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   const token = localStorage.getItem("token");
 
@@ -50,33 +57,121 @@ useEffect(() => {
   // }, [token]);
 
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+     const { name, value, files } = e.target;
+    
+  if (files) {
+    const file = files[0];
+    setFormData(prev => ({ ...prev, [name]: file }));
+    setPreview(URL.createObjectURL(file)); // ✅ preview
+  } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+  }
+  };
+  const handleEdit = (user) => {
+    console.log(user);
+    setFormData({
+      username: user.username,
+      email: user.email || "",
+      password: "",
+      role: user.role,
+      address: user.address,
+      phone: user.phone,
+      profilImage: ''
+    });
+
+    setEditId(user._id);
+    setIsEditing(true);
+    setShowForm(true);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleDelete = async (id, role) => {
+    if (!window.confirm(`Delete this ${role}?`)) return;
+
     try {
-      const res = await fetch("http://localhost:5000/users/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
+      const res = await fetch(
+        `http://localhost:5000/users/delete/${id}?role=${role}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       const data = await res.json();
+
       if (res.ok) {
-        alert(`${formData.role} added successfully!`);
-        setFormData({ username: "", email: "", password: "", role: "User" });
-        setShowForm(false);
-        fetchUsers();
+        alert(data.message);
+        fetchUsers(); // refresh table
       } else {
-        alert(data.message || "Error adding user");
+        alert(data.message || "Delete failed");
       }
     } catch (err) {
       console.log(err);
     }
   };
+  const getLoggedInAdminId = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.id;
+  } catch {
+    return null;
+  }
+};
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formPayload = new FormData();
+      for (let key in formData) {
+        if (formData[key]) formPayload.append(key, formData[key]);
+      }
+      for (let pair of formPayload.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+      alert('Testing');
+      // console.log(formPayload);
+      // alert('working');
+      let url = "http://localhost:5000/users/add";
+      let method = "POST";
+
+      if (editId) {
+        url = `http://localhost:5000/users/update/${editId}`;
+        method = "PUT";
+      }
+      console.log(formData);
+      const res = await fetch(url, {
+        method,
+        headers: { Authorization: `Bearer ${token}` },
+        body: formPayload,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(`${formData.role} ${editId ? "updated" : "added"} successfully!`);
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          role: "User",
+          address: "",
+          phone: "",
+          profilePicture: null,
+        });
+        setShowForm(false);
+        setEditId(null);
+        fetchUsers();
+      } else {
+        alert(data.message || "Error");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const loggedInAdminId = getLoggedInAdminId();
 
   return (
     <div className="dashboard-container">
@@ -125,11 +220,49 @@ useEffect(() => {
                 onChange={handleChange}
                 required
               />
+              <label>Address</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+              />
+
+              <label>Phone</label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+              />
+
+              <label>Profile Picture URL</label>
+              <input
+                type="file"
+                name="profilePicture"
+                accept="image/*"
+                onChange={handleChange}
+              />
+
+              {preview && (
+                <img
+                  src={preview}
+                  alt="Preview"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    marginTop: "10px",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc"
+                  }}
+                />
+              )}
             </>
           )}
 
           <button type="submit" className="btn btn-submit">
-            Add {formData.role}
+            {isEditing ? "Update" : "Add"} {formData.role}
           </button>
         </form>
       )}
@@ -137,20 +270,59 @@ useEffect(() => {
       <table className="users-table">
         <thead>
           <tr>
+            <th>Profile</th>
             <th>Username</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Address</th>
+            <th>Phone</th>
             <th>Created</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {users.length > 0 ? (
             users.map(u => (
               <tr key={u._id}>
+                <td>
+                  {u.profilePicture ? (
+                    <img
+                      src={`http://localhost:5000${u.profilePicture}`}
+                      alt="Profile"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                        objectFit: "cover"
+                      }}
+                    />
+                  ) : (
+                    <span>—</span>
+                  )}
+                </td>
                 <td>{u.username}</td>
                 <td>{u.email || "-"}</td>
                 <td>{u.role}</td>
+                <td>{u.address || "-"}</td>
+                <td>{u.phone || "-"}</td>
                 <td>{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "-"}</td>
+                <td>
+                  { <button
+                      className="btn btn-edit"
+                      onClick={() => handleEdit(u)}
+                    >
+                      Edit
+                    </button>
+                  }
+                  {!(u.role === "Admin" && u._id === loggedInAdminId) && (
+                    <button
+                      className="btn btn-delete"
+                      onClick={() => handleDelete(u._id, u.role)}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </td>
               </tr>
             ))
           ) : (

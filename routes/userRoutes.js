@@ -4,23 +4,97 @@ const User = require("../models/User");
 const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
 const auth = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
+// Update user or admin by ID
+router.put("/update/:id", auth, upload.single("profilePicture"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role, username, email, address, phone, password, profilePicture } = req.body;
+   if (role === "Admin") {
+    const updateData = {
+      username,
+      email,
+      address,  
+      phone,
+      profilImage: req.body.profilePicture
+    };
+    if (password) updateData.password = await bcrypt.hash(password, 10);
+
+    const admin = await Admin.findByIdAndUpdate(id, updateData, { new: true });
+    if (!admin) return res.status(404).json({ message: "Admin not found" });
+
+    return res.json({ message: "Admin updated successfully" });
+  }
+
+    
+    console.log(role);
+    const user = await User.findByIdAndUpdate(
+      id,
+      { username, email },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User updated successfully" });
+    if (role === "Admin" && req.admin.id !== id) {
+      return res.status(403).json({ message: "Cannot edit other admins" });
+    }
+  }
+  catch (err){
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Delete user or admin by ID
+router.delete("/delete/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.query; // role comes from frontend
+    if (role === "Admin") {
+      const admin = await Admin.findByIdAndDelete(id);
+      if (!admin) return res.status(404).json({ message: "Admin not found" });
+      return res.json({ message: "Admin deleted successfully" });
+    }
+
+    const user = await User.findByIdAndDelete(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User deleted successfully" });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // Add user or admin
-router.post("/add", auth, async (req, res) => {
+router.post("/add", auth, upload.single("profilePicture"), async (req, res) => {
   try {
     const { role, username, email, password } = req.body;
 
-    if (role === "Admin") {
-      if (!username || !password || !email) return res.status(400).json({ message: "Username and password required" });
-      const existingAdmin = await Admin.findOne({ username });
-      if (existingAdmin) return res.status(400).json({ message: "Admin already exists" });
+   if (role === "Admin") {
+    if (!username || !password || !email) 
+        return res.status(400).json({ message: "Username, email, and password required" });
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const admin = new Admin({ username, email , password: hashedPassword });
-      await admin.save();
-      return res.json({ message: "Admin added successfully" });
-    } else {
+    const existingAdmin = await Admin.findOne({ username });
+    if (existingAdmin) return res.status(400).json({ message: "Admin already exists" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const admin = new Admin({ 
+      username,
+      email,
+      password: hashedPassword,
+      address: req.body.address,
+      phone: req.body.phone,
+      profilImage: req.body.profilePicture // store URL or base64 string
+    });
+
+    await admin.save();
+    return res.json({ message: "Admin added successfully" });
+  }
+  else {
       if (!username || !email) return res.status(400).json({ message: "Username and email required" });
       const existingUser = await User.findOne({ username });
       if (existingUser) return res.status(400).json({ message: "User already exists" });

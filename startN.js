@@ -65,6 +65,7 @@ const mongodb = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const path = require("path");
 const authRoutes = require('./routes/authRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
 const usersRouter = require("./routes/userRoutes"); // <-- correct
@@ -76,6 +77,8 @@ app.use(cors());
 // Routes
 app.use('/auth', authRoutes);
 app.use("/users", usersRouter); // <-- fix here
+app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Protected Example Route
 app.get('/admin/dashboard', authMiddleware, async (req, res) => {
