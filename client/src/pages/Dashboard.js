@@ -11,7 +11,7 @@ export default function Dashboard() {
     role: "User",
     address: "",
     phone: "",
-    profilePicture: "" // URL or base64
+    profilImage: "" // URL or base64
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -67,8 +67,21 @@ useEffect(() => {
       setFormData(prev => ({ ...prev, [name]: value }));
   }
   };
+  const handleView = (user) => {
+    window.location.href = `/author?username=${user.username}`;
+  }
   const handleEdit = (user) => {
-    console.log(user);
+    const proImage = (<img
+                      src={`http://localhost:5000${user.profilImage}`}
+                      alt="Profile"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                        objectFit: "cover"
+                      }}
+                    />);
+    
     setFormData({
       username: user.username,
       email: user.email || "",
@@ -76,7 +89,7 @@ useEffect(() => {
       role: user.role,
       address: user.address,
       phone: user.phone,
-      profilImage: ''
+      profilImage: proImage ? proImage : (<span>--</span>)
     });
 
     setEditId(user._id);
@@ -129,12 +142,6 @@ useEffect(() => {
       for (let key in formData) {
         if (formData[key]) formPayload.append(key, formData[key]);
       }
-      for (let pair of formPayload.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-      alert('Testing');
-      // console.log(formPayload);
-      // alert('working');
       let url = "http://localhost:5000/users/add";
       let method = "POST";
 
@@ -159,7 +166,7 @@ useEffect(() => {
           role: "User",
           address: "",
           phone: "",
-          profilePicture: null,
+          profilImage: null,
         });
         setShowForm(false);
         setEditId(null);
@@ -239,7 +246,7 @@ useEffect(() => {
               <label>Profile Picture URL</label>
               <input
                 type="file"
-                name="profilePicture"
+                name="profilImage"
                 accept="image/*"
                 onChange={handleChange}
               />
@@ -285,9 +292,9 @@ useEffect(() => {
             users.map(u => (
               <tr key={u._id}>
                 <td>
-                  {u.profilePicture ? (
+                  {u.profilImage ? (
                     <img
-                      src={`http://localhost:5000${u.profilePicture}`}
+                      src={`http://localhost:5000${u.profilImage}`}
                       alt="Profile"
                       style={{
                         width: "40px",
@@ -307,6 +314,13 @@ useEffect(() => {
                 <td>{u.phone || "-"}</td>
                 <td>{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "-"}</td>
                 <td>
+                  { <button
+                      className="btn btn-view"
+                      onClick={() => handleView(u)}
+                    >
+                      View
+                    </button>
+                  }
                   { <button
                       className="btn btn-edit"
                       onClick={() => handleEdit(u)}

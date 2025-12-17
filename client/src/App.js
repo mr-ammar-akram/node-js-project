@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./ProtectedRoute";
+import Author from "./pages/Author";
 
 function App() {
   return (
@@ -32,6 +33,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route 
+          path="/author" element={
+            <ProtectedRoute>
+              <Layout>
+                <Author />
+              </Layout>
+            </ProtectedRoute>
+          } />
       </Routes>
     </BrowserRouter>
   );
