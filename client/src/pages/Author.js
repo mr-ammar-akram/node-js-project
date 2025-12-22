@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { MdEmail, MdLocationOn } from "react-icons/md";
+import { FaUserShield, FaPhoneAlt } from "react-icons/fa";
+
 import "./Author.css";
 
 export default function Author() {
@@ -21,6 +24,7 @@ export default function Author() {
         },
       });
       const data = await response.json();
+      console.log(data);
       const userdata = data.user || data.admin;
       setProfile(userdata);
     };
@@ -50,14 +54,33 @@ export default function Author() {
         <div className="author-meta">
             <div className="author-icon-list">
                 <ul>
-                    <li>{profile.email}</li>
-                    <li>{profile.role}</li>
-                    <li>{profile.address}</li>
-                    <li>{profile.phone}</li>
+                    <li>
+                        <MdEmail className="icon" />
+                        <span>{profile.email}</span>
+                    </li>
+
+                    <li>
+                        <FaUserShield className="icon" />
+                        <span>{profile.role}</span>
+                    </li>
+
+                    <li>
+                        <MdLocationOn className="icon" />
+                        <span>{profile.address || "N/A"}</span>
+                    </li>
+
+                    <li>
+                        <FaPhoneAlt className="icon" />
+                        <span>{profile.phone || "N/A"}</span>
+                    </li>
                 </ul>
             </div>
         </div>
 
+      </div>
+      <div className="author-bio">
+        <h4>About</h4>
+        <p>{profile.information || "No information available."}</p>
       </div>
     </div>
   );

@@ -7,31 +7,41 @@ const auth = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 
 // Update user or admin by ID
-router.put("/update/:id", auth, upload.single("profilePicture"), async (req, res) => {
+router.put("/update/:id", auth, upload.single("profilImage"), async (req, res) => {
   try {
     const { id } = req.params;
-    const { role, username, email, address, phone, password, profilePicture } = req.body;
+    const { role, username, email, address, phone, information, password, profilImage } = req.body;
+    console.log();
    if (role === "Admin") {
     const updateData = {
       username,
       email,
-      address,  
+      role,
+      address,
+      information,
       phone,
-      profilImage: req.body.profilePicture
+      profilImage: req.file ? `/uploads/${req.file.filename}` : null
+
     };
     if (password) updateData.password = await bcrypt.hash(password, 10);
-
     const admin = await Admin.findByIdAndUpdate(id, updateData, { new: true });
     if (!admin) return res.status(404).json({ message: "Admin not found" });
 
     return res.json({ message: "Admin updated successfully" });
   }
+    const updateData = {
+      username,
+      email,
+      role,
+      address,
+      information,
+      phone,
+      profilImage: req.file ? `/uploads/${req.file.filename}` : null
 
-    
-    console.log(role);
+    };
     const user = await User.findByIdAndUpdate(
       id,
-      { username, email },
+      updateData,
       { new: true }
     );
 
@@ -69,9 +79,9 @@ router.delete("/delete/:id", auth, async (req, res) => {
 });
 
 // Add user or admin
-router.post("/add", auth, upload.single("profilePicture"), async (req, res) => {
+router.post("/add", auth, upload.single("profilImage"), async (req, res) => {
   try {
-    const { role, username, email, password } = req.body;
+    const { role, username, email, phone, address, information, password, profilImage } = req.body;
 
    if (role === "Admin") {
     if (!username || !password || !email) 
@@ -85,10 +95,12 @@ router.post("/add", auth, upload.single("profilePicture"), async (req, res) => {
     const admin = new Admin({ 
       username,
       email,
+      information: req.body.information,
       password: hashedPassword,
+      role: req.body.role,
       address: req.body.address,
       phone: req.body.phone,
-      profilImage: req.body.profilePicture // store URL or base64 string
+      profilImage: req.file ? `/uploads/${req.file.filename}` : null  // store URL or base64 string
     });
 
     await admin.save();
@@ -99,7 +111,7 @@ router.post("/add", auth, upload.single("profilePicture"), async (req, res) => {
       const existingUser = await User.findOne({ username });
       if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-      const user = new User({ username, email });
+      const user = new User({ username, email, role, information, phone, address, profilImage: req.file ? `/uploads/${req.file.filename}` : null });
       await user.save();
       return res.json({ message: "User added successfully" });
     }

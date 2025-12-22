@@ -1,13 +1,15 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const auth = require("../middleware/authMiddleware");
+const upload = require("../middleware/Upload");
 const Admin = require('../models/Admin');
+const User = require('../models/User');
 
 const router = express.Router();
 
 // Register Admin (One-time)
 router.post('/register', async (req, res) => {
-    console.log(req);
     try {
         const { username, password } = req.body;
 
@@ -22,6 +24,26 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// View Auhtor
+router.get("/author", auth, async (req, res) => {
+  console.log(req);
+  const { username } = req.query;
+  try {
+      const admin = await Admin.findOne({username});
+      if(admin){
+        console.log(admin);
+        res.json({ admin });
+      } 
+      const user = await User.findOne({ username });
+      if(user){
+        console.log(user);
+        res.json({ user });
+      }
+  }
+  catch(err){
+    res.status(500).json({ message: err.message });
+  }
+});
 // Login Admin
 router.post('/login', async (req, res) => {
     try {

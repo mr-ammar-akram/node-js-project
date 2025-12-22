@@ -10,6 +10,7 @@ export default function Dashboard() {
     password: "",
     role: "User",
     address: "",
+    information: "",
     phone: "",
     profilImage: "" // URL or base64
   });
@@ -71,6 +72,7 @@ useEffect(() => {
     window.location.href = `/author?username=${user.username}`;
   }
   const handleEdit = (user) => {
+    console.log(user);
     const proImage = (<img
                       src={`http://localhost:5000${user.profilImage}`}
                       alt="Profile"
@@ -88,6 +90,7 @@ useEffect(() => {
       password: "",
       role: user.role,
       address: user.address,
+      information: user.information,
       phone: user.phone,
       profilImage: proImage ? proImage : (<span>--</span>)
     });
@@ -165,6 +168,7 @@ useEffect(() => {
           password: "",
           role: "User",
           address: "",
+          information: "",
           phone: "",
           profilImage: null,
         });
@@ -215,7 +219,6 @@ useEffect(() => {
             onChange={handleChange}
             required
           />
-
           {/* Password only for Admin */}
           {formData.role === "Admin" && (
             <>
@@ -227,6 +230,9 @@ useEffect(() => {
                 onChange={handleChange}
                 required
               />
+            </>
+          )}
+
               <label>Address</label>
               <input
                 type="text"
@@ -243,6 +249,13 @@ useEffect(() => {
                 onChange={handleChange}
               />
 
+              <label>Information</label>
+              <textarea
+                name="information"
+                value={formData.information}
+                onChange={handleChange}
+              />
+
               <label>Profile Picture URL</label>
               <input
                 type="file"
@@ -250,7 +263,6 @@ useEffect(() => {
                 accept="image/*"
                 onChange={handleChange}
               />
-
               {preview && (
                 <img
                   src={preview}
@@ -265,9 +277,6 @@ useEffect(() => {
                   }}
                 />
               )}
-            </>
-          )}
-
           <button type="submit" className="btn btn-submit">
             {isEditing ? "Update" : "Add"} {formData.role}
           </button>
@@ -310,8 +319,8 @@ useEffect(() => {
                 <td>{u.username}</td>
                 <td>{u.email || "-"}</td>
                 <td>{u.role}</td>
-                <td>{u.address || "-"}</td>
-                <td>{u.phone || "-"}</td>
+                <td>{u.address || "-?"}</td>
+                <td>{u.phone || "-?"}</td>
                 <td>{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "-"}</td>
                 <td>
                   { <button

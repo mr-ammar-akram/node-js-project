@@ -131,7 +131,8 @@ table tr:hover {
 
 /* Forms (Login & Register) */
 form input[type="text"],
-form input[type="password"] {
+form input[type="password"],
+form textarea {
   width: 100%;
   padding: 10px 12px;
   margin-top: 10px;
