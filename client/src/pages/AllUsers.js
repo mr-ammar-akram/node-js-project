@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-
 import "./Dashboard.css";
 
 export default function Dashboard() {
@@ -17,22 +16,23 @@ export default function Dashboard() {
     phone: "",
     profilImage: "" // URL or base64
   });
-
+  let i = 1;
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [page, setPage] = React.useState(1);
-  const usersPerPage = 5;
-
-  const handlePageChange = (event, value) => {
-    setPage(value);
-  };
-
-  const totalPages = Math.ceil(users.length / usersPerPage);
-
-  const startIndex = (page - 1) * usersPerPage;
-  const endIndex = startIndex + usersPerPage;
-  const paginatedUsers = users.slice(startIndex, endIndex);
+    const [page, setPage] = React.useState(1);
+    const usersPerPage = 10;
+  
+    const handlePageChange = (event, value) => {
+      setPage(value);
+    };
+  
+    const totalPages = Math.ceil(users.length / usersPerPage);
+  
+    const startIndex = (page - 1) * usersPerPage;
+    const endIndex = startIndex + usersPerPage;
+    const paginatedUsers = users.slice(startIndex, endIndex);
+  
 
   const token = localStorage.getItem("token");
 
@@ -71,6 +71,10 @@ useEffect(() => {
   // useEffect(() => {
   //   fetchUsers();
   // }, [token]);
+
+    const backToHome = e => {
+        window.location.href = `/dashboard`;
+    }
 
   const handleChange = (e) => {
      const { name, value, files } = e.target;
@@ -203,8 +207,8 @@ useEffect(() => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h2>All Users</h2>
-        <button className="btn btn-add" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Cancel" : "Add User/Admin"}
+        <button className="btn btn-back" onClick={() => backToHome(!showForm)}>
+          Back to Home
         </button>
       </div>
 
@@ -271,15 +275,13 @@ useEffect(() => {
                 onChange={handleChange}
               />
 
-              <label className="file-upload">
+              <label>Profile Picture URL</label>
               <input
                 type="file"
                 name="profilImage"
                 accept="image/*"
                 onChange={handleChange}
               />
-              <span>Profile Picture</span>
-              </label>
               {preview && (
                 <img
                   src={preview}
@@ -303,6 +305,7 @@ useEffect(() => {
       <table className="users-table">
         <thead>
           <tr>
+            <th>#Sr.</th>
             <th>Profile</th>
             <th>Username</th>
             <th>Email</th>
@@ -315,8 +318,9 @@ useEffect(() => {
         </thead>
         <tbody>
           {users.length > 0 ? (
-            paginatedUsers.map((u) => (
+            paginatedUsers.map(u => (
               <tr key={u._id}>
+                <td>{i++}</td>
                 <td>
                   {u.profilImage ? (
                     <img

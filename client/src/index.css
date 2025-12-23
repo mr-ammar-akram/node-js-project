@@ -54,15 +54,14 @@ body, html, #root {
   padding: 10px 20px;
   flex-shrink: 0;
 }
-
-/* Sidebar */
 .sidebar {
-  background-color: #f8f9fa;
+  background-color: #343a41; /* dark background */
   min-height: 100vh;
   width: 250px;
   padding: 20px;
   flex-shrink: 0;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid #495057;
+  color: #e5e7eb;
 }
 
 .sidebar h5 {
@@ -79,7 +78,7 @@ body, html, #root {
 }
 
 .sidebar ul li a {
-  color: #333;
+  color: #e5e7eb;
   text-decoration: none;
   font-weight: 500;
   display: block;
@@ -89,9 +88,60 @@ body, html, #root {
 }
 
 .sidebar ul li a:hover {
-  background-color: #007bff;
+  background-color: #0d6efd;
   color: #fff;
 }
+
+/* Parent menu */
+.sidebar-link {
+  display: block;
+  padding: 8px 12px;
+  text-decoration: none;
+  color: #e5e7eb;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.sidebar-link:hover {
+  background: #495057;
+}
+
+/* Active link */
+.sidebar-link.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* Submenu wrapper */
+.sidebar ul ul {
+  margin-top: 6px;
+  padding-left: 12px;
+  border-left: 2px solid #6c757d;
+}
+
+/* Submenu items */
+.sidebar ul ul .sidebar-link {
+  font-size: 14px;
+  padding: 6px 12px;
+  color: #adb5bd;
+}
+
+/* Submenu hover */
+.sidebar ul ul .sidebar-link:hover {
+  background: #495057;
+}
+
+/* Submenu active */
+.sidebar ul ul .sidebar-link.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* Optional: spacing between parent & submenu */
+.sidebar li > ul {
+  margin-bottom: 10px;
+}
+
 
 /* Main content */
 main {
@@ -121,9 +171,9 @@ table th {
   color: #fff;
 }
 
-table tr:nth-child(even) {
+/* table tr:nth-child(even) {
   background-color: #f2f2f2;
-}
+} */
 
 table tr:hover {
   background-color: #d9edf7;
@@ -271,7 +321,7 @@ form button:hover {
 .auth-link:hover {
   text-decoration: underline;
 }
-.sidebar-link {
+/* .sidebar-link {
   text-decoration: none;
   color: #333;
   font-weight: bold;
@@ -287,4 +337,4 @@ form button:hover {
 .sidebar-link.active {
   background-color: #1d4ed8;
   color: white;
-}
+} */

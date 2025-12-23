@@ -1,10 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./layout/Layout";
 import Dashboard from "./pages/Dashboard";
+import AllUsers from "./pages/AllUsers";
+import AddUser from "./pages/AddUser";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./ProtectedRoute";
 import Author from "./pages/Author";
+import AllPosts from "./pages/AllPosts";
+import AddPost from "./pages/AddPost";
 
 function App() {
   return (
@@ -33,6 +37,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/users" element={<AllUsers />} />
+
+        <Route 
+          path="/users/add" element={
+            <ProtectedRoute>
+              <Layout>
+                <AddUser />
+              </Layout>
+            </ProtectedRoute>
+          } />
         <Route 
           path="/author" element={
             <ProtectedRoute>
@@ -41,7 +55,16 @@ function App() {
               </Layout>
             </ProtectedRoute>
           } />
-      </Routes>
+        <Route path="/posts" element={<AllPosts />} />
+        <Route 
+          path="/posts/add" element={
+            <ProtectedRoute>
+              <Layout>
+                <AddPost />
+              </Layout>
+            </ProtectedRoute>
+          } />
+        </Routes>
     </BrowserRouter>
   );
 }
