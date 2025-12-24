@@ -176,7 +176,78 @@
 .MuiPagination-root {
   margin-top: 20px;
 }
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
 
+.post-card {
+  background: #343a41;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+}
+
+/* IMAGE */
+.post-image img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* CONTENT */
+.post-content {
+  padding: 16px;
+  color: #e5e7eb;
+}
+
+.post-title {
+  font-size: 18px;
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.post-desc {
+  font-size: 14px;
+  color: #adb5bd;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* META */
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #adb5bd;
+}
+
+/* BUTTON */
+.post-meta .btn-view, .post-meta .btn-delete {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.post-btns{
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+.dashboard-post-section {
+    margin-top: 20px;
+}
+
+.dashboard-post-section h2 {
+    color: #333;
+}
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .add-form {
@@ -191,5 +262,12 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 576px) {
+  .post-image img {
+    height: 150px;
   }
 }

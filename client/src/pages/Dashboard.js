@@ -6,6 +6,7 @@ import "./Dashboard.css";
 
 export default function Dashboard() {
   const [users, setUsers] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -22,14 +23,20 @@ export default function Dashboard() {
   const [editId, setEditId] = useState(null);
   const [preview, setPreview] = useState(null);
   const [page, setPage] = React.useState(1);
+  const [postPage, setPostPage] = React.useState(1);
   const usersPerPage = 5;
-
+  const POSTS_PER_PAGE = 6;
   const handlePageChange = (event, value) => {
     setPage(value);
   };
 
   const totalPages = Math.ceil(users.length / usersPerPage);
+  const totalPostPages = Math.ceil(posts.length / POSTS_PER_PAGE);
 
+  const paginatedPosts = posts.slice(
+    (postPage - 1) * POSTS_PER_PAGE,
+    postPage * POSTS_PER_PAGE
+  );
   const startIndex = (page - 1) * usersPerPage;
   const endIndex = startIndex + usersPerPage;
   const paginatedUsers = users.slice(startIndex, endIndex);
@@ -53,12 +60,19 @@ export default function Dashboard() {
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5000/users/all", {
+      const usersRes = await fetch("http://localhost:5000/users/all", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error("Unauthorized");
-      const data = await res.json();
-      setUsers(data);
+      if (!usersRes.ok) throw new Error("Unauthorized");
+      const usersData = await usersRes.json();
+      setUsers(usersData);
+
+      const postsRes = await fetch("http://localhost:5000/posts/all", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!postsRes.ok) throw new Error("Unauthorized");
+      const postsData = await postsRes.json();
+      setPosts(postsData);
     } catch (err) {
       console.log(err);
       window.location.href = "/login"; 
@@ -385,6 +399,64 @@ useEffect(() => {
         )}
         </>
 
+    <div>
+      <div className="dashboard-post-section">
+        <h2>All Posts</h2>
+      </div>
+      <div className="posts-grid">
+          {paginatedPosts.map((post) => (
+            <div className="post-card" key={post._id}>
+              {/* Featured Image */}
+              {post.featuredImage && (
+                <div className="post-image">
+                  <img
+                    src={`http://localhost:5000${post.featuredImage}`}
+                    alt={post.title}
+                  />
+                </div>
+              )}
+
+              {/* Content */}
+              <div className="post-content">
+                <h3 className="post-title">{post.title}</h3>
+
+                {post.description && (
+                  <p className="post-desc">
+                    {post.description.length > 120
+                      ? post.description.slice(0, 120) + "..."
+                      : post.description}
+                  </p>
+                )}
+
+                <div className="post-meta">
+                  <span>
+                    {post.createdAt
+                      ? new Date(post.createdAt).toLocaleDateString()
+                      : "—"}
+                  </span>
+                  <span className="post-btns">
+                    <button className="btn btn-view">View</button>
+                    <button className="btn btn-delete">Delete</button>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+
+      {/* PAGINATION */}
+      {totalPostPages > 1 && (
+        <Stack spacing={2} alignItems="center" mt={4}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, value) => setPostPage(value)}
+            color="primary"
+          />
+        </Stack>
+      )}
+        </div>
     </div>
   );
 }

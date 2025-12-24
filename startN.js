@@ -67,6 +67,7 @@ require('dotenv').config();
 
 const path = require("path");
 const authRoutes = require('./routes/authRoutes');
+const postRoutes = require('./routes/postRoutes');
 const authMiddleware = require('./middleware/authMiddleware');
 const usersRouter = require("./routes/userRoutes"); // <-- correct
 
@@ -76,6 +77,7 @@ app.use(cors());
 
 // Routes
 app.use('/auth', authRoutes);
+app.use('/posts', postRoutes);
 app.use("/users", usersRouter); // <-- fix here
 app.use("/uploads", express.static("uploads"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

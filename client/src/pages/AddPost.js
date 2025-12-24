@@ -5,7 +5,7 @@ export default function AddUser() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    featuredimage: "",
+    featuredImage: "",
   });
   const [preview, setPreview] = useState(null);
 
@@ -32,20 +32,20 @@ export default function AddUser() {
     const payload = new FormData();
     payload.append("title", formData.title);
     payload.append("description", formData.description);
-    if(formData.featuredimage){
-         payload.append("featuredImage", formData.featuredimage);
+    if(formData.featuredImage){
+         payload.append("featuredImage", formData.featuredImage);
     }
     const res = await fetch("http://localhost:5000/posts/add", {
         method: "POST",
-        header: {
-            Authorization: `Bearer ${token}`
+        headers: {
+            Authorization: `Bearer ${token}`,
         },
         body: payload
     });
     const data = await res.json();
     if (res.ok) {
         alert("Post Added Successfully.....");
-        setFormData({ title: "", description: "", featuredimage: null});
+        setFormData({ title: "", description: "", featuredImage: null});
     }else{
         alert(data.message);
     }

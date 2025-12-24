@@ -1,74 +1,97 @@
-import { useEffect, useState, useCallback } from "react";
-import "./AllPosts.css";
+import React, { useEffect, useState } from "react";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+import "./Dashboard.css";
 
-export default function WhatsAppContacts() {
-    const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+export default function AllUsers() {
+  const [posts, setPosts] = useState([]);
+  const POSTS_PER_PAGE = 12;
+  const [page, setPage] = useState(1);
 
-  // useCallback fixes eslint exhaustive-deps warning
-  const fetchContacts = useCallback(async () => {
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+
+  const paginatedPosts = posts.slice(
+    (page - 1) * POSTS_PER_PAGE,
+    page * POSTS_PER_PAGE
+  );
+  const token = localStorage.getItem("token");
+useEffect(() => {
+  const fetchUsers = async () => {
     try {
-      setLoading(true);
-      setError("");
-
-      const res = await fetch("http://localhost:5000/api/whatsapp-contacts");
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch contacts");
-      }
-
-      const data = await res.json();
-
-      // adjust this based on actual API response structure
-      setContacts(data.contacts || data || []);
+      const postsRes = await fetch("http://localhost:5000/posts/all", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!postsRes.ok) throw new Error("Unauthorized");
+      const postsData = await postsRes.json();
+      setPosts(postsData);
     } catch (err) {
-      console.error(err);
-      setError("Unable to load contacts");
-    } finally {
-      setLoading(false);
+      console.log(err);
+      window.location.href = "/login"; 
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    fetchContacts();
-  }, [fetchContacts]);
+  fetchUsers();
+}, [token]); // include token because it's used inside
 
-  if (loading) return <p>Loading contacts...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  return(
+<div className="dashboard-container">
+  <div className="dashboard-post-section">
+    <h2>All Posts</h2>
+  </div>
 
+  <div className="posts-grid">
+    {paginatedPosts.map((post) => (
+      <div className="post-card" key={post._id}>
 
-  return (
-    <div className="wa-container">
-      <header className="wa-header">
-        <h1>WhatsApp Contacts</h1>
-        <button onClick={fetchContacts}>↻ Refresh</button>
-      </header>
-
-      {loading && <div className="wa-loading">Loading contacts…</div>}
-
-      {error && <div className="wa-error">{error}</div>}
-
-      {!loading && !error && contacts.length === 0 && (
-        <div className="wa-empty">No contacts found</div>
-      )}
-
-      <div className="wa-grid">
-        {contacts.map((c, i) => (
-          <div className="wa-card" key={i}>
-            <div className="avatar">
-              {c.name ? c.name[0] : "?"}
-            </div>
-
-            <div className="info">
-              <h3>{c.name || "Unknown Contact"}</h3>
-              <p>{c.phone || "No phone number"}</p>
-            </div>
-
-            <button className="chat-btn">💬</button>
+        {/* Featured Image */}
+        {post.featuredImage && (
+          <div className="post-image">
+            <img
+              src={`http://localhost:5000${post.featuredImage}`}
+              alt={post.title}
+            />
           </div>
-        ))}
+        )}
+
+        {/* Content */}
+        <div className="post-content">
+          <h3 className="post-title">{post.title}</h3>
+
+          {post.description && (
+            <p className="post-desc">
+              {post.description.length > 120
+                ? post.description.slice(0, 120) + "..."
+                : post.description}
+            </p>
+          )}
+
+          <div className="post-meta">
+            <span>
+              {post.createdAt
+                ? new Date(post.createdAt).toLocaleDateString()
+                : "—"}
+            </span>
+
+            <button className="btn btn-view">View</button>
+          </div>
+        </div>
+
       </div>
-    </div>
+    ))}
+  </div>
+
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <Stack spacing={2} alignItems="center" mt={4}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, value) => setPage(value)}
+            color="primary"
+          />
+        </Stack>
+      )}
+</div>
+
   );
 }

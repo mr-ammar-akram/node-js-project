@@ -24,21 +24,12 @@ router.put("/update/:id", auth, upload.single("profilImage"), async (req, res) =
 
     };
     if (password) updateData.password = await bcrypt.hash(password, 10);
+    console.log(updateData);
     const admin = await Admin.findByIdAndUpdate(id, updateData, { new: true });
     if (!admin) return res.status(404).json({ message: "Admin not found" });
 
     return res.json({ message: "Admin updated successfully" });
   }
-    const updateData = {
-      username,
-      email,
-      role,
-      address,
-      information,
-      phone,
-      profilImage: req.file ? `/uploads/${req.file.filename}` : null
-
-    };
     const user = await User.findByIdAndUpdate(
       id,
       updateData,
@@ -111,7 +102,7 @@ router.post("/add", auth, upload.single("profilImage"), async (req, res) => {
       const existingUser = await User.findOne({ username });
       if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-      const user = new User({ username, email, role, information, phone, address, profilImage: req.file ? `/uploads/${req.file.filename}` : null });
+      const user = new User({ username, email, role, information, phone, address, profilImage });
       await user.save();
       return res.json({ message: "User added successfully" });
     }
@@ -130,7 +121,6 @@ router.get("/all", auth, async (req, res) => {
       ...admins.map(a => ({ ...a._doc, role: "Admin" })),
       ...users.map(u => ({ ...u._doc, role: "User" }))
     ];
-    console.log(allUsers);
     // sort by createdAt descending (Admin doesn’t have createdAt, so optional)
     allUsers.sort((a, b) => new Date(b.createdAt || Date.now()) - new Date(a.createdAt || Date.now()));
 
