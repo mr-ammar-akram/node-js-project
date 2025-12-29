@@ -9,6 +9,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Author from "./pages/Author";
 import AllPosts from "./pages/AllPosts";
 import AddPost from "./pages/AddPost";
+import EditPost from "./pages/EditPost";
 
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <AddPost />
+              </Layout>
+            </ProtectedRoute>
+          } />
+        <Route 
+          path="/editpost" element={
+            <ProtectedRoute>
+              <Layout>
+                <EditPost />
               </Layout>
             </ProtectedRoute>
           } />

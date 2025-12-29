@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AddPost.css";
 
-export default function AddUser() {
+export default function AddPost() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -46,6 +48,7 @@ export default function AddUser() {
     if (res.ok) {
         alert("Post Added Successfully.....");
         setFormData({ title: "", description: "", featuredImage: null});
+        navigate("/dashboard");
     }else{
         alert(data.message);
     }

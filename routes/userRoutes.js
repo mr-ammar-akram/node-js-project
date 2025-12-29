@@ -11,7 +11,6 @@ router.put("/update/:id", auth, upload.single("profilImage"), async (req, res) =
   try {
     const { id } = req.params;
     const { role, username, email, address, phone, information, password, profilImage } = req.body;
-    console.log();
    if (role === "Admin") {
     const updateData = {
       username,

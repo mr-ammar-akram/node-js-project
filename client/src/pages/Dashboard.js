@@ -45,15 +45,22 @@ export default function Dashboard() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5000/users/all", {
+      const usersRes = await fetch("http://localhost:5000/users/all", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error("Unauthorized");
-      const data = await res.json();
-      setUsers(data);
+      if (!usersRes.ok) throw new Error("Unauthorized");
+      const usersData = await usersRes.json();
+      setUsers(usersData);
+
+      const postsRes = await fetch("http://localhost:5000/posts/all", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!postsRes.ok) throw new Error("Unauthorized");
+      const postsData = await postsRes.json();
+      setPosts(postsData);
     } catch (err) {
       console.log(err);
-      window.location.href = "/login";
+      window.location.href = "/login"; 
     }
   };
 
@@ -100,8 +107,10 @@ useEffect(() => {
   const handleView = (user) => {
     window.location.href = `/author?username=${user.username}`;
   }
+  const handleEditPost = (postId) => {
+    window.location.href = `/editpost/?id=${postId}`;
+  }
   const handleEdit = (user) => {
-    console.log(user);
     const proImage = (<img
                       src={`http://localhost:5000${user.profilImage}`}
                       alt="Profile"
@@ -129,6 +138,32 @@ useEffect(() => {
     setShowForm(true);
   };
 
+  const handleDeletePost = async (id) => {
+    if (!window.confirm(`Delete this ${id}?`)) return;
+  
+    try {
+      const res = await fetch(
+        `http://localhost:5000/posts/delete/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        fetchUsers(); // refresh table
+      } else {
+        alert(data.message || "Delete failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
   const handleDelete = async (id, role) => {
     if (!window.confirm(`Delete this ${role}?`)) return;
 
@@ -436,7 +471,12 @@ useEffect(() => {
                   </span>
                   <span className="post-btns">
                     <button className="btn btn-view">View</button>
-                    <button className="btn btn-delete">Delete</button>
+                    <button className="btn btn-delete"
+                     onClick={() => handleDeletePost(post._id)}
+                    >Delete</button>
+                    <button className="btn btn-edit"
+                     onClick={() => handleEditPost(post._id)}
+                    >Edit</button>
                   </span>
                 </div>
               </div>
