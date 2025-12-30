@@ -65,7 +65,7 @@ router.delete("/delete/:id", auth, async (req, res) => {
 
   } catch (err) {
     res.status(500).json({ message: err.message });
-  }
+  } 
 });
 
 // Add user or admin

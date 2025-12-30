@@ -26,17 +26,14 @@ router.post('/register', async (req, res) => {
 
 // View Auhtor
 router.get("/author", auth, async (req, res) => {
-  console.log(req);
   const { username } = req.query;
   try {
       const admin = await Admin.findOne({username});
       if(admin){
-        console.log(admin);
         res.json({ admin });
       } 
       const user = await User.findOne({ username });
       if(user){
-        console.log(user);
         res.json({ user });
       }
   }

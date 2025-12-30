@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import "./Dashboard.css";
@@ -55,7 +56,11 @@ useEffect(() => {
 
         {/* Content */}
         <div className="post-content">
-          <h3 className="post-title">{post.title}</h3>
+          <h3 className="post-title">
+            <Link to={`/posts/${post.slug}`}>
+              {post.title}
+            </Link>
+          </h3>
 
           {post.description && (
             <p className="post-desc">

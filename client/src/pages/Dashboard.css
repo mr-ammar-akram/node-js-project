@@ -209,10 +209,11 @@
   color: #e5e7eb;
 }
 
-.post-title {
+.post-title a{
   font-size: 18px;
-  margin: 0 0 10px;
   font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 8px;
 }
 
 .post-desc {

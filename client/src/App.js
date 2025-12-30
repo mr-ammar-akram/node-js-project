@@ -10,6 +10,7 @@ import Author from "./pages/Author";
 import AllPosts from "./pages/AllPosts";
 import AddPost from "./pages/AddPost";
 import EditPost from "./pages/EditPost";
+import SinglePost from "./pages/SinglePost";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
             </ProtectedRoute>
           } />
         <Route path="/posts" element={<AllPosts />} />
+        <Route path="/posts/:slug" element={<SinglePost />} />
         <Route 
           path="/posts/add" element={
             <ProtectedRoute>

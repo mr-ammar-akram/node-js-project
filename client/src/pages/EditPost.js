@@ -6,6 +6,7 @@ export default function EditPost() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     description: "",
     featuredImage: null,
   });
@@ -28,13 +29,16 @@ export default function EditPost() {
         if (!res.ok) throw new Error("Unauthorized");
 
         const data = await res.json();
+        const ptitle = data.post.title;
+        let slug = ptitle.replace(/\W+/g, '-');
+        slug = slug.toLowerCase();
         setFormData({
-          title: data.post.title,   
+          title: data.post.title,
+          slug: slug || '',
           description: data.post.description,
-          featuredImage: data.post.featuredImage,
+          featuredImage: `${data.post.featuredImage}`,
         });
-
-        setPreview(`http://localhost:5000${data.post.featuredImage}`); // image URL from backend
+        setPreview(`${data.post.featuredImage}`); // image URL from backend
       } catch (err) {
         console.error(err);
       }
@@ -62,12 +66,10 @@ export default function EditPost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const formPayload = new FormData();
     for (let key in formData) {
         formPayload.append(key, formData[key]);
     }
-
     const res = await fetch(`http://localhost:5000/posts/update/${postId}`, {
         method: "PUT",
         headers: {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 
@@ -137,7 +138,6 @@ useEffect(() => {
     setIsEditing(true);
     setShowForm(true);
   };
-
   const handleDeletePost = async (id) => {
     if (!window.confirm(`Delete this ${id}?`)) return;
   
@@ -445,7 +445,7 @@ useEffect(() => {
               {post.featuredImage && (
                 <div className="post-image">
                   <img
-                    src={`http://localhost:5000${post.featuredImage}`}
+                    src={post.featuredImage.includes("http://") ? post.featuredImage :`http://localhost:5000${post.featuredImage}`}
                     alt={post.title}
                   />
                 </div>
@@ -453,7 +453,11 @@ useEffect(() => {
 
               {/* Content */}
               <div className="post-content">
-                <h3 className="post-title">{post.title}</h3>
+                <h3 className="post-title">
+                    <Link to={`/posts/${post.slug}`}>
+                        {post.title}
+                    </Link>
+                </h3>
 
                 {post.description && (
                   <p className="post-desc">
@@ -470,7 +474,9 @@ useEffect(() => {
                       : "—"}
                   </span>
                   <span className="post-btns">
-                    <button className="btn btn-view">View</button>
+                    <Link to={`/posts/${post.slug}`} className="btn btn-view">
+                      View
+                    </Link>
                     <button className="btn btn-delete"
                      onClick={() => handleDeletePost(post._id)}
                     >Delete</button>

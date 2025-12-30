@@ -6,6 +6,7 @@ export default function AddPost() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     description: "",
     featuredImage: "",
   });
@@ -31,8 +32,12 @@ export default function AddPost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    const ptitle = formData.title;
+    let slug = ptitle.replace(/\W+/g, '-');
+    slug = slug.toLowerCase();
     const payload = new FormData();
     payload.append("title", formData.title);
+    payload.append("slug", slug);
     payload.append("description", formData.description);
     if(formData.featuredImage){
          payload.append("featuredImage", formData.featuredImage);

@@ -58,7 +58,7 @@
   flex: 1;
 }
 
-.post-title {
+.post-title a{
   font-size: 18px;
   font-weight: 600;
   color: #ffffff;
