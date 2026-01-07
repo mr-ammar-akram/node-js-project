@@ -1,18 +1,64 @@
 import React, { useEffect, useState } from "react";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
 import { useNavigate } from "react-router-dom";
 import "./AddPost.css";
 
+
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
 export default function EditPost() {
+  const [postCategories, setPostCategories] = useState([]);
+
+    const token = localStorage.getItem("token");
+        /* ================= FETCH CATEGORIES ================= */
+        useEffect(() => {
+          const fetchCategories = async () => {
+            try {
+              const res = await fetch("http://localhost:5000/posts/categories", {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+      
+              if (res.status === 401) {
+                window.location.href = "/login";
+                return;
+              }
+      
+              const data = await res.json();
+              setPostCategories(data);
+            } catch (err) {
+              console.error(err);
+            }
+          };
+          fetchCategories();
+        }, [token]);
+  
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
+    postCat: "",
     description: "",
     featuredImage: null,
   });
+const [categoryName, setCategoryName] = React.useState([]);
 
   const [preview, setPreview] = useState(null);
-  const token = localStorage.getItem("token");
 
   const queryString = window.location.search;
   const params = new URLSearchParams(queryString);
@@ -22,7 +68,7 @@ export default function EditPost() {
 
     const fetchPost = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/posts/${postId}`, {
+        const res = await fetch(`http://localhost:5000/posts/editpost/${postId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -32,9 +78,13 @@ export default function EditPost() {
         const ptitle = data.post.title;
         let slug = ptitle.replace(/\W+/g, '-');
         slug = slug.toLowerCase();
+        if(data.postCat){
+            setCategoryName(data.postCat);
+        }
         setFormData({
           title: data.post.title,
           slug: slug || '',
+          postCate: data.postCat,
           description: data.post.description,
           featuredImage: `${data.post.featuredImage}`,
         });
@@ -47,6 +97,21 @@ export default function EditPost() {
     fetchPost();
   }, [token, postId]);
 
+  const handleSelectChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setFormData(
+      (prev) => ({
+        ...prev,
+        postCat: typeof value === 'string' ? value.split(',') : value,
+      })
+    );
+    setCategoryName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
   const handleChange = (e) => {
     const {name, value, files} = e.target;
 
@@ -67,6 +132,8 @@ export default function EditPost() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formPayload = new FormData();
+    console.log(formData);
+    alert('testing');
     for (let key in formData) {
         formPayload.append(key, formData[key]);
     }
@@ -117,6 +184,28 @@ export default function EditPost() {
               required
             />
           </div>
+
+          {/* Select Category */}
+            <FormControl sx={{ m: 1 }}>
+                <InputLabel id="demo-multiple-checkbox-label">Categories</InputLabel>
+                <Select
+                labelId="demo-multiple-checkbox-label"
+                id="demo-multiple-checkbox"
+                multiple
+                value={categoryName}
+                onChange={handleSelectChange}
+                input={<OutlinedInput label="Categories" />}
+                renderValue={(selected) => selected.join(', ')}
+                MenuProps={MenuProps}
+                >
+                {postCategories.map((category) => (
+                    <MenuItem key={category.categoryName} value={category.categoryName}>
+                    <Checkbox checked={categoryName.includes(category.categoryName)} />
+                    <ListItemText primary={category.categoryName} />
+                    </MenuItem>
+                ))}
+                </Select>
+            </FormControl>
 
           {/* FEATURED IMAGE */}
           <div className="form-group">

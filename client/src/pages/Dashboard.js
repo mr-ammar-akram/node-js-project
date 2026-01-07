@@ -59,6 +59,7 @@ export default function Dashboard() {
       if (!postsRes.ok) throw new Error("Unauthorized");
       const postsData = await postsRes.json();
       setPosts(postsData);
+
     } catch (err) {
       console.log(err);
       window.location.href = "/login"; 
@@ -453,6 +454,9 @@ useEffect(() => {
 
               {/* Content */}
               <div className="post-content">
+                {post.postCat 
+                ? <span className="post-category">{post.postCat}</span>
+                : ""}
                 <h3 className="post-title">
                     <Link to={`/posts/${post.slug}`}>
                         {post.title}

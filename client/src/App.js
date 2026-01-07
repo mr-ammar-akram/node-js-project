@@ -11,6 +11,7 @@ import AllPosts from "./pages/AllPosts";
 import AddPost from "./pages/AddPost";
 import EditPost from "./pages/EditPost";
 import SinglePost from "./pages/SinglePost";
+import Categories from "./pages/Categories";
 
 function App() {
   return (
@@ -59,6 +60,12 @@ function App() {
           } />
         <Route path="/posts" element={<AllPosts />} />
         <Route path="/posts/:slug" element={<SinglePost />} />
+        <Route path="/posts/categories" element={
+            <ProtectedRoute>
+              <Layout>
+                <Categories />
+              </Layout>
+            </ProtectedRoute>} />
         <Route 
           path="/posts/add" element={
             <ProtectedRoute>

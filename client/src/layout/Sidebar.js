@@ -101,6 +101,17 @@ export default function Sidebar() {
                 Add New Post
               </NavLink>
             </li>
+            <li className="submenu-item">
+              <NavLink
+                to="/posts/categories"
+                end
+                className={({ isActive }) =>
+                  isActive ? "sidebar-link active" : "sidebar-link"
+                }
+              >
+                Categories
+              </NavLink>
+            </li>
             </ul>
           )}
         </li>

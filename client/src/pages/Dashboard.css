@@ -77,8 +77,17 @@
 .add-form label {
   font-size: 13px;
   opacity: 0.8;
+  color: #64748b;
 }
-
+.css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline {
+    border-color: #64748b !important;
+}
+.css-1rfqz7c-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon {
+    color: #64748b !important;
+}
+.css-18jp67o-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input{
+  color: #fff !important;
+}
 .add-form input,
 .add-form select,
 .add-form textarea {
@@ -169,7 +178,7 @@
 /* ===== EMPTY STATE ===== */
 .text-center {
   text-align: center;
-  opacity: 0.7;
+  /* opacity: 0.7; */
 }
 
 /* ===== PAGINATION (MUI SAFE) ===== */
@@ -208,7 +217,9 @@
   padding: 16px;
   color: #e5e7eb;
 }
-
+.post-title{
+  margin-top: 10px;
+}
 .post-title a{
   font-size: 18px;
   font-weight: 600;

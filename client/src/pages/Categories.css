@@ -1,0 +1,13 @@
+.category-parent-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    color: #ffff;
+    margin-top: 20px;
+}
+
+.category-form {
+    width: 30%;
+}
+
+.category-data {width: 70%;}

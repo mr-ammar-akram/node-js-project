@@ -7,34 +7,10 @@ const SinglePost = () => {
   const [post, setPost] = useState(null);
   const [error, setError] = useState("");
 
-//   useEffect(() => {
-//     const fetchPost = async () => {
-//     const token = localStorage.getItem("token");
-
-//       try {
-//         const res = await fetch(`http://localhost:5000/posts/${slug}`, {
-//             method: "GET",
-//             headers: {
-//                 Authorization: `Bearer ${token}`,
-//             },
-//         });
-        
-//         if (!res.ok) {
-//           throw new Error("Post not found");
-//         }
-//         const data = await res.json();
-//         setPost(data);
-//       } catch (err) {
-//         setError(err.message);
-//       }
-//     };
-
-//     fetchPost();
-//   }, [slug]);
 useEffect(() => {
   const fetchPost = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/posts/${slug}`);
+      const res = await fetch(`http://localhost:5000/posts/post/${slug}`);
 
       if (!res.ok) {
         throw new Error("Post not found");
