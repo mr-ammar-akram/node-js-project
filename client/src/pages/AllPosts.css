@@ -64,7 +64,20 @@
   color: #ffffff;
   margin: 0 0 8px;
 }
+.post-categories {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
+.category-item {
+    border: 1px solid #343a42;
+    border-radius: 50px;
+    padding: 5px 10px;
+    font-size: 12px;
+    background-color: #facc14;
+    color: #343a42;
+}
 .post-desc {
   font-size: 14px;
   color: #ced4da;

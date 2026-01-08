@@ -12,6 +12,7 @@ import AddPost from "./pages/AddPost";
 import EditPost from "./pages/EditPost";
 import SinglePost from "./pages/SinglePost";
 import Categories from "./pages/Categories";
+import SingleCategory from "./pages/SingleCategory";
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
                 <Categories />
               </Layout>
             </ProtectedRoute>} />
+        <Route path="/categories/:slug" element={<SingleCategory />} />
         <Route 
           path="/posts/add" element={
             <ProtectedRoute>

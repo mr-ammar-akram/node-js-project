@@ -1,54 +1,60 @@
-import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import "./Dashboard.css";
+import "./SingleCategory.css";
 
-export default function AllUsers() {
-  const [posts, setPosts] = useState([]);
-  const POSTS_PER_PAGE = 12;
-  const [page, setPage] = useState(1);
-
-  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
-
-  const paginatedPosts = posts.slice(
-    (page - 1) * POSTS_PER_PAGE,
-    page * POSTS_PER_PAGE
-  );
+const SingleCategory = () => {
+  const { slug } = useParams();
+  const [posts, setPost] = useState([]);
+  const [searchCate, setSearchedCate] = useState([]);
+  const [error, setError] = useState("");
+    const POSTS_PER_PAGE = 12;
+    const [page, setPage] = useState(1);
+  
+    const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+  
+    const paginatedPosts = posts.slice(
+      (page - 1) * POSTS_PER_PAGE,
+      page * POSTS_PER_PAGE
+    );
   const token = localStorage.getItem("token");
 
-
-  const fetchPosts = async () => {
+  const fetchCategories = async () => {
     try {
-      const postsRes = await fetch("http://localhost:5000/posts/all", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!postsRes.ok) throw new Error("Unauthorized");
-      const postsData = await postsRes.json();
-      setPosts(postsData);
+      const res = await fetch(`http://localhost:5000/posts/categories/category/${slug}`);
+
+      if (!res.ok) {
+        throw new Error("Post not found");
+      }
+      const data = await res.json();
+      setPost(data.posts);
+      setSearchedCate(data.searchCate);
     } catch (err) {
-      console.log(err);
-      window.location.href = "/login"; 
+      setError(err.message);
     }
   };
 
 useEffect(() => {
-  const fetchUsers = async () => {
+  const fetchCategories = async () => {
     try {
-      const postsRes = await fetch("http://localhost:5000/posts/all", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!postsRes.ok) throw new Error("Unauthorized");
-      const postsData = await postsRes.json();
-      setPosts(postsData);
+      const res = await fetch(`http://localhost:5000/posts/categories/${slug}`);
+
+      if (!res.ok) {
+        throw new Error("Post not found");
+      }
+      const data = await res.json();
+      setPost(data.posts);
+      setSearchedCate(data.searchCate);
     } catch (err) {
-      console.log(err);
-      window.location.href = "/login"; 
+      setError(err.message);
     }
   };
 
-  fetchUsers();
-}, [token]); // include token because it's used inside
+  fetchCategories();
+}, [slug]);
+
 
   const handleDeletePost = async (id) => {
     if (!window.confirm(`Delete this ${id}?`)) return;
@@ -68,7 +74,7 @@ useEffect(() => {
 
       if (res.ok) {
         alert(data.message);
-        fetchPosts(); // refresh table
+        fetchCategories(); // refresh table
       } else {
         alert(data.message || "Delete failed");
       }
@@ -80,10 +86,14 @@ useEffect(() => {
   const handleEditPost = (postId) => {
     window.location.href = `/editpost/?id=${postId}`;
   }
-  return(
+
+  if (error) return <p>{error}</p>;
+  if (!posts) return <p>Loading...</p>;
+
+  return (
 <div className="dashboard-container">
       <div className="dashboard-post-section">
-        <h2>All Posts</h2>
+        <h2>{searchCate}</h2>
       </div>
       <div className="posts-grid">
           {paginatedPosts.map((post) => (
@@ -103,9 +113,11 @@ useEffect(() => {
                 <div className="post-categories">
                   {post.postCat &&
                     post.postCat.map((cat, index) => (
-                      <span key={index} className={`category-item`}>
-                        {cat.trim()}
-                      </span>
+                        <Link  key={index} to={`/categories/${cat.trim().toLowerCase()}`}>
+                            <span className={`category-item`}>
+                                {cat.trim()}
+                            </span>
+                        </Link>
                     ))
                   }
                 </div>
@@ -159,6 +171,7 @@ useEffect(() => {
         </Stack>
       )}
 </div>
-
   );
-}
+};
+
+export default SingleCategory;

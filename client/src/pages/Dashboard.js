@@ -217,7 +217,6 @@ useEffect(() => {
         url = `http://localhost:5000/users/update/${editId}`;
         method = "PUT";
       }
-      console.log(formData);
       const res = await fetch(url, {
         method,
         headers: { Authorization: `Bearer ${token}` },
@@ -454,9 +453,17 @@ useEffect(() => {
 
               {/* Content */}
               <div className="post-content">
-                {post.postCat 
-                ? <span className="post-category">{post.postCat}</span>
-                : ""}
+                <div className="post-categories">
+                  {post.postCat &&
+                    post.postCat.map((cat, index) => (
+                    <Link  key={index} to={`/categories/${cat.trim().toLowerCase()}`}>
+                      <span className={`category-item`}>
+                        {cat.trim()}
+                      </span>
+                    </Link>
+                    ))
+                  }
+                </div>
                 <h3 className="post-title">
                     <Link to={`/posts/${post.slug}`}>
                         {post.title}

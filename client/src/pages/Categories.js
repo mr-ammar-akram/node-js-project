@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
+import { Link } from "react-router-dom";
 import "./Categories.css";
 
 export default function Categories() {
@@ -11,12 +12,31 @@ export default function Categories() {
     categoryImage: null,
   });
   const [preview, setPreview] = useState(null);
+  const [editId, setEditId] = useState(null);
   const [page, setPage] = useState(1);
 
   const categoriesPerPage = 10;
   const token = localStorage.getItem("token");
 
   /* ================= FETCH CATEGORIES ================= */
+
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/posts/categories", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
+        const data = await res.json();
+        setPostCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -76,28 +96,71 @@ export default function Categories() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/posts/categories/add", {
+        let url = "http://localhost:5000/posts/categories/add";
+        if(editId){
+            url = `http://localhost:5000/posts/categories/update/${editId}`;
+        }
+
+      const res = await fetch(url, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: payload,
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         alert(data.message || "Failed");
         return;
       }
 
       setPostCategories((prev) => [data.category, ...prev]);
+    //   setPostCategories((prev) => [data.category, ...prev]);
       setFormData({ categoryName: "", description: "", categoryImage: null });
+      alert(`Category ${editId ? "updated" : "added"} successfully`);
       setPreview(null);
-      alert("Category added successfully");
+      setEditId(null);
     } catch (err) {
       console.error(err);
     }
   };
 
+  const handleEdit = async (editCategory) => {
+    console.log(editCategory.categoryImage);
+    setFormData({
+        categoryName: editCategory.categoryName,
+        description: editCategory.description,
+        catSlug: editCategory.catSlug,
+        categoryImage: editCategory.categoryImage,
+    });
+    setPreview(`http://localhost:3000/${editCategory.categoryImage}`);
+    setEditId(editCategory._id);
+  }
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Delete this ${name}?`)) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/posts/categories/delete/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message);
+        fetchCategories(); // refresh table
+      } else {
+        alert(data.message || "Delete failed");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   /* ================= JSX ================= */
   return (
     
@@ -148,7 +211,7 @@ export default function Categories() {
           )}
 
           <button type="submit" className="btn btn-submit">
-            Add Category
+            {editId ? "Update Category" : "Add Category"}
           </button>
         </form>
       </div>
@@ -184,11 +247,19 @@ export default function Categories() {
                       "—"
                     )}
                   </td>
-                  <td>{c.categoryName}</td>
+                  <td>
+                    <Link to={`/categories/${c.catSlug}`}>
+                        {c.categoryName}   
+                    </Link>
+                  </td>
                   <td>{c.description || "-"}</td>
                   <td>
-                    <button className="btn btn-edit">Edit</button>
-                    <button className="btn btn-delete">Delete</button>
+                    <button className="btn btn-edit"
+                    onClick={() => handleEdit(c)}
+                    >Edit</button>
+                    <button className="btn btn-delete"
+                    onClick={() => handleDelete(c._id, c.categoryName)}
+                    >Delete</button>
                   </td>
                 </tr>
               ))

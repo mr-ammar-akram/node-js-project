@@ -22,7 +22,7 @@ router.post(
                 title,
                 description,
                 slug,
-                postCat,
+                postCat: postCat.split(","),
                 featuredImage: req.file
                 ? `/uploads/posts/${req.file.filename}`
                 : null,
@@ -102,7 +102,7 @@ router.put("/update/:id", auth, upload.single('featuredImage'), async (req, res)
     const updateData = {
         title,
         slug,
-        postCat,
+        postCat: postCat.split(","),
         description,
         featuredImage: req.file
                 ? `/uploads/posts/${req.file.filename}`
@@ -162,6 +162,65 @@ router.post(
             }
     });
 
+// Update Post Category Admin only
+router.post(
+    "/categories/update/:id",
+    auth,
+    upload.single("categoryImage"),
+    async (req, res) =>{
+        try{
+        const { id } = req.params;
+        const { categoryName, catSlug, description, categoryImage } = req.body;
+        const fImageUrl = categoryImage;
+        const updateData = {
+            categoryName,
+            catSlug,
+            description,
+            categoryImage: req.file
+                ? `/uploads/posts/${req.file.filename}`
+                : fImageUrl,
+        };
+        console.log(updateData);
+        const category = await Category.findByIdAndUpdate(id, updateData, { new: true });   
+        if (!category) return res.status(404).json({ message: "Category not found" });
+            res.json({
+                message: "Post added Successfully",
+                category
+            });
+        }
+        catch(err){
+            res.status(500).json({ message: err.message });
+        }
+    })
+
+// Delete Category by id
+router.delete("/categories/delete/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+      const category = await Category.findByIdAndDelete(id);
+      if (!category) return res.status(404).json({ message: "Post not found" });
+      return res.json({ message: "Post deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// View Category
+router.get(
+  "/categories/:slug",
+  async (req, res) => {
+    try {
+      const category = await Category.findOne({ catSlug: req.params.slug });
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    const posts = await Post.find({ postCat: category.categoryName });
+      res.json({posts, searchCate: category.categoryName });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+);
 router.get("/post/:slug", async (req, res) => {
   try {
     const post = await Post.findOne({ slug: req.params.slug });
