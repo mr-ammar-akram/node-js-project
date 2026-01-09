@@ -114,18 +114,17 @@ export default function Categories() {
       }
 
       setPostCategories((prev) => [data.category, ...prev]);
-    //   setPostCategories((prev) => [data.category, ...prev]);
       setFormData({ categoryName: "", description: "", categoryImage: null });
       alert(`Category ${editId ? "updated" : "added"} successfully`);
       setPreview(null);
       setEditId(null);
+      fetchCategories();
     } catch (err) {
       console.error(err);
     }
   };
 
   const handleEdit = async (editCategory) => {
-    console.log(editCategory.categoryImage);
     setFormData({
         categoryName: editCategory.categoryName,
         description: editCategory.description,

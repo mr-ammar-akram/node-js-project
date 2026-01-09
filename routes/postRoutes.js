@@ -180,7 +180,6 @@ router.post(
                 ? `/uploads/posts/${req.file.filename}`
                 : fImageUrl,
         };
-        console.log(updateData);
         const category = await Category.findByIdAndUpdate(id, updateData, { new: true });   
         if (!category) return res.status(404).json({ message: "Category not found" });
             res.json({
